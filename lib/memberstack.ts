@@ -54,7 +54,7 @@ export async function createPaymentRecord(payment: Payment): Promise<boolean> {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': MEMBERSTACK_SECRET_KEY,
+        'Authorization': `Bearer ${MEMBERSTACK_SECRET_KEY}`,
       },
       body: JSON.stringify({
         query: mutation,
@@ -126,7 +126,7 @@ export async function fetchRecentPayments(limit: number = 20): Promise<Payment[]
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': MEMBERSTACK_SECRET_KEY,
+        'Authorization': `Bearer ${MEMBERSTACK_SECRET_KEY}`,
         ...(MEMBERSTACK_APP_ID && { 'x-app-id': MEMBERSTACK_APP_ID }),
       },
       body: JSON.stringify({
