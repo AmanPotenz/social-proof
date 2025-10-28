@@ -7,16 +7,19 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 });
 
 export async function POST(req: NextRequest) {
-  const body = await req.text();
   const sig = req.headers.get('stripe-signature');
 
   let event: Stripe.Event;
 
   try {
+    // Get raw body as buffer for signature verification
+    const buffer = await req.arrayBuffer();
+    const body = Buffer.from(buffer);
+
     // Verify webhook signature
     if (!sig || !process.env.STRIPE_WEBHOOK_SECRET) {
       // For development/testing without webhook secret
-      event = JSON.parse(body);
+      event = JSON.parse(body.toString());
     } else {
       event = stripe.webhooks.constructEvent(
         body,
