@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
               name: 'Test Product',
               description: 'Social Proof Demo Purchase',
             },
-            unit_amount: 1000, // $10.00 in cents
+            unit_amount: 900, // $9.00 in cents
           },
           quantity: 1,
         },
