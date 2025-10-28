@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
       amount: (session.amount_total || 0) / 100, // Convert from cents
       currency: session.currency?.toUpperCase() || 'USD',
       timestamp: Date.now(),
-      email: session.customer_details?.email,
+      email: session.customer_details?.email || undefined,
     };
 
     // Add to store
