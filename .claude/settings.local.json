@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git fetch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git pull:*)",
+      "Bash(npx mcp-remote https://mcp.memberstack.com/mcp)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(stripe:*)",
+      "Bash(scoop --version:*)",
+      "Bash(winget install:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
