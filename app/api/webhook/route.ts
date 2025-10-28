@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { paymentsStore } from '@/lib/payments-store';
-import { createPaymentRecord } from '@/lib/memberstack';
+import { createPaymentRecord } from '@/lib/airtable';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2025-09-30.clover',
@@ -78,13 +78,13 @@ export async function POST(req: NextRequest) {
     paymentsStore.addPayment(payment);
     console.log('✓ Payment added to in-memory store:', payment);
 
-    // Save to Memberstack for persistence
-    console.log('→ Attempting to save to Memberstack...');
+    // Save to Airtable for persistence
+    console.log('→ Attempting to save to Airtable...');
     const saved = await createPaymentRecord(payment);
     if (saved) {
-      console.log('✓ Payment saved to Memberstack successfully!');
+      console.log('✓ Payment saved to Airtable successfully!');
     } else {
-      console.error('✗ Failed to save payment to Memberstack');
+      console.error('✗ Failed to save payment to Airtable');
     }
   } else {
     console.log('Ignoring event type:', event.type);

@@ -31,7 +31,11 @@
       "Bash(git restore:*)",
       "mcp__memberstack__getDataRecords",
       "mcp__memberstack__createDataRecord",
-      "mcp__memberstack__memberstackKnowledgeSearch"
+      "mcp__memberstack__memberstackKnowledgeSearch",
+      "Read(//c/**)",
+      "mcp__memberstack__createMemberEmailPassword",
+      "Bash(curl:*)",
+      "Bash(python -m json.tool:*)"
     ],
     "deny": [],
     "ask": []
