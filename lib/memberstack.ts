@@ -87,6 +87,7 @@ export async function createPaymentRecord(payment: Payment): Promise<boolean> {
 // Fetch recent payments from Memberstack
 export async function fetchRecentPayments(limit: number = 20): Promise<Payment[]> {
   const MEMBERSTACK_SECRET_KEY = process.env.MEMBERSTACK_SECRET_KEY;
+  const MEMBERSTACK_APP_ID = process.env.MEMBERSTACK_APP_ID;
 
   if (!MEMBERSTACK_SECRET_KEY) {
     console.error('Memberstack API key not configured');
@@ -115,11 +116,18 @@ export async function fetchRecentPayments(limit: number = 20): Promise<Payment[]
   };
 
   try {
+    console.log('Fetching from Memberstack with:', {
+      hasKey: !!MEMBERSTACK_SECRET_KEY,
+      hasAppId: !!MEMBERSTACK_APP_ID,
+      tableId: 'tbl_cmhabevx800050sff5ap65nlr',
+    });
+
     const response = await fetch(MEMBERSTACK_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': MEMBERSTACK_SECRET_KEY,
+        ...(MEMBERSTACK_APP_ID && { 'x-app-id': MEMBERSTACK_APP_ID }),
       },
       body: JSON.stringify({
         query,
@@ -127,15 +135,23 @@ export async function fetchRecentPayments(limit: number = 20): Promise<Payment[]
       }),
     });
 
+    const responseText = await response.text();
+
     if (!response.ok) {
-      console.error('Memberstack API HTTP error:', response.status);
+      console.error('Memberstack API HTTP error:', response.status, responseText.substring(0, 200));
       return [];
     }
 
-    const result = await response.json();
+    let result;
+    try {
+      result = JSON.parse(responseText);
+    } catch (e) {
+      console.error('Failed to parse Memberstack response:', responseText.substring(0, 200));
+      return [];
+    }
 
     if (result.errors) {
-      console.error('Memberstack API error:', result.errors);
+      console.error('Memberstack API GraphQL errors:', JSON.stringify(result.errors, null, 2));
       return [];
     }
 
@@ -167,7 +183,7 @@ export async function fetchRecentPayments(limit: number = 20): Promise<Payment[]
       };
     });
 
-    console.log(`Fetched ${payments.length} payments from Memberstack`);
+    console.log(`✓ Fetched ${payments.length} payments from Memberstack`);
     return payments;
   } catch (error) {
     console.error('Error fetching payments from Memberstack:', error);
