@@ -28,7 +28,9 @@
       "mcp__memberstack__getDataTables",
       "mcp__memberstack__createDataTable",
       "mcp__memberstack__createDataTableField",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "mcp__memberstack__getDataRecords",
+      "mcp__memberstack__createDataRecord"
     ],
     "deny": [],
     "ask": []
