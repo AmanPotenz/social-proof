@@ -35,6 +35,19 @@ export default function Home() {
     }
   };
 
+  // Handle custom checkout (redirects back to main site)
+  const handleCustomCheckout = async () => {
+    try {
+      const response = await fetch('/api/create-checkout', { method: 'POST' });
+      const { url } = await response.json();
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+    }
+  };
+
   // Initial fetch and polling every 5 seconds
   useEffect(() => {
     fetchPayments();
@@ -92,14 +105,12 @@ export default function Home() {
 
         {/* Test Purchase Button */}
         <div className="text-center mb-8">
-          <a
-            href="https://buy.stripe.com/test_14AeVf22pgPcgmI7K54AU00"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition-all"
+          <button
+            onClick={handleCustomCheckout}
+            className="inline-block px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition-all cursor-pointer"
           >
-            Make Test Purchase
-          </a>
+            Make Test Purchase (Redirects Back Here)
+          </button>
         </div>
 
         {/* Payment Blocks */}

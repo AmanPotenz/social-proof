@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { paymentsStore } from '@/lib/payments-store';
+import { createPaymentRecord } from '@/lib/memberstack';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2025-09-30.clover',
@@ -65,10 +66,17 @@ export async function POST(req: NextRequest) {
       email: session.customer_details?.email || undefined,
     };
 
-    // Add to store
+    // Add to in-memory store for immediate display
     paymentsStore.addPayment(payment);
+    console.log('Payment added to store:', payment);
 
-    console.log('Payment added:', payment);
+    // Save to Memberstack for persistence
+    const saved = await createPaymentRecord(payment);
+    if (saved) {
+      console.log('Payment saved to Memberstack');
+    } else {
+      console.error('Failed to save payment to Memberstack');
+    }
   }
 
   return NextResponse.json({ received: true });
