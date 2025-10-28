@@ -1,7 +1,6 @@
 // Memberstack service for managing payment data
 
 const MEMBERSTACK_API_URL = 'https://admin.memberstack.com/graphql';
-const MEMBERSTACK_SECRET_KEY = process.env.MEMBERSTACK_SECRET_KEY;
 
 export interface Payment {
   id: string;
@@ -14,6 +13,8 @@ export interface Payment {
 
 // Create a payment record in Memberstack
 export async function createPaymentRecord(payment: Payment): Promise<boolean> {
+  const MEMBERSTACK_SECRET_KEY = process.env.MEMBERSTACK_SECRET_KEY;
+
   if (!MEMBERSTACK_SECRET_KEY) {
     console.error('Memberstack API key not configured');
     return false;
@@ -23,6 +24,7 @@ export async function createPaymentRecord(payment: Payment): Promise<boolean> {
     mutation CreatePaymentRecord($input: CreateDataRecordInput!) {
       createDataRecord(input: $input) {
         id
+        data
       }
     }
   `;
@@ -35,18 +37,24 @@ export async function createPaymentRecord(payment: Payment): Promise<boolean> {
         customerName: payment.customerName,
         amount: payment.amount,
         currency: payment.currency,
-        email: payment.email || null,
+        email: payment.email || '',
         timestamp: new Date(payment.timestamp).toISOString(),
       },
     },
   };
 
   try {
+    console.log('Saving payment to Memberstack:', {
+      sessionId: payment.id,
+      customerName: payment.customerName,
+      amount: payment.amount,
+    });
+
     const response = await fetch(MEMBERSTACK_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-API-KEY': MEMBERSTACK_SECRET_KEY,
+        'Authorization': `Bearer ${MEMBERSTACK_SECRET_KEY}`,
       },
       body: JSON.stringify({
         query: mutation,
@@ -57,11 +65,11 @@ export async function createPaymentRecord(payment: Payment): Promise<boolean> {
     const result = await response.json();
 
     if (result.errors) {
-      console.error('Memberstack API error:', result.errors);
+      console.error('Memberstack API error:', JSON.stringify(result.errors, null, 2));
       return false;
     }
 
-    console.log('Payment saved to Memberstack:', result.data);
+    console.log('Payment saved to Memberstack successfully:', result.data?.createDataRecord?.id);
     return true;
   } catch (error) {
     console.error('Error saving payment to Memberstack:', error);
@@ -71,6 +79,8 @@ export async function createPaymentRecord(payment: Payment): Promise<boolean> {
 
 // Fetch recent payments from Memberstack
 export async function fetchRecentPayments(limit: number = 20): Promise<Payment[]> {
+  const MEMBERSTACK_SECRET_KEY = process.env.MEMBERSTACK_SECRET_KEY;
+
   if (!MEMBERSTACK_SECRET_KEY) {
     console.error('Memberstack API key not configured');
     return [];
@@ -102,7 +112,7 @@ export async function fetchRecentPayments(limit: number = 20): Promise<Payment[]
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-API-KEY': MEMBERSTACK_SECRET_KEY,
+        'Authorization': `Bearer ${MEMBERSTACK_SECRET_KEY}`,
       },
       body: JSON.stringify({
         query,
@@ -114,6 +124,11 @@ export async function fetchRecentPayments(limit: number = 20): Promise<Payment[]
 
     if (result.errors) {
       console.error('Memberstack API error:', result.errors);
+      return [];
+    }
+
+    if (!result.data?.getDataRecords?.edges) {
+      console.log('No payment records found in Memberstack');
       return [];
     }
 
@@ -130,6 +145,7 @@ export async function fetchRecentPayments(limit: number = 20): Promise<Payment[]
       };
     });
 
+    console.log(`Fetched ${payments.length} payments from Memberstack`);
     return payments;
   } catch (error) {
     console.error('Error fetching payments from Memberstack:', error);
