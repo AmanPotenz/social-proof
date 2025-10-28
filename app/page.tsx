@@ -39,12 +39,20 @@ export default function Home() {
   const handleCustomCheckout = async () => {
     try {
       const response = await fetch('/api/create-checkout', { method: 'POST' });
-      const { url } = await response.json();
-      if (url) {
-        window.location.href = url;
+      const data = await response.json();
+
+      if (data.error) {
+        console.error('Checkout error:', data.error);
+        alert('Error creating checkout. Please try the direct link below.');
+        return;
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
       }
     } catch (error) {
       console.error('Error creating checkout session:', error);
+      alert('Error creating checkout. Please try the direct link below.');
     }
   };
 
@@ -103,14 +111,27 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Test Purchase Button */}
-        <div className="text-center mb-8">
-          <button
-            onClick={handleCustomCheckout}
-            className="inline-block px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition-all cursor-pointer"
-          >
-            Make Test Purchase (Redirects Back Here)
-          </button>
+        {/* Test Purchase Buttons */}
+        <div className="text-center mb-8 space-y-4">
+          <div>
+            <button
+              onClick={handleCustomCheckout}
+              className="inline-block px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition-all cursor-pointer"
+            >
+              Make Test Purchase (Auto-Redirect)
+            </button>
+          </div>
+          <div className="text-gray-400 text-sm">or</div>
+          <div>
+            <a
+              href="https://buy.stripe.com/test_14AeVf22pgPcgmI7K54AU00"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all"
+            >
+              Direct Stripe Link (Opens New Tab)
+            </a>
+          </div>
         </div>
 
         {/* Payment Blocks */}
