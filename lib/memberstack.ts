@@ -1,6 +1,6 @@
 // Memberstack service for managing payment data
-
-const MEMBERSTACK_API_URL = 'https://admin.memberstack.io/graphql';
+// Note: Using REST API base URL since GraphQL endpoint has DNS issues
+const MEMBERSTACK_API_URL = 'https://api.memberstack.com/v1/graphql';
 
 export interface Payment {
   id: string;
