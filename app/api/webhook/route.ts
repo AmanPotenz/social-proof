@@ -52,9 +52,17 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  console.log('Webhook event type:', event.type);
+
   // Handle the checkout.session.completed event
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
+
+    console.log('Processing checkout.session.completed:', {
+      sessionId: session.id,
+      customerName: session.customer_details?.name,
+      amount: session.amount_total,
+    });
 
     // Extract payment information
     const payment = {
@@ -68,15 +76,18 @@ export async function POST(req: NextRequest) {
 
     // Add to in-memory store for immediate display
     paymentsStore.addPayment(payment);
-    console.log('Payment added to store:', payment);
+    console.log('✓ Payment added to in-memory store:', payment);
 
     // Save to Memberstack for persistence
+    console.log('→ Attempting to save to Memberstack...');
     const saved = await createPaymentRecord(payment);
     if (saved) {
-      console.log('Payment saved to Memberstack');
+      console.log('✓ Payment saved to Memberstack successfully!');
     } else {
-      console.error('Failed to save payment to Memberstack');
+      console.error('✗ Failed to save payment to Memberstack');
     }
+  } else {
+    console.log('Ignoring event type:', event.type);
   }
 
   return NextResponse.json({ received: true });
