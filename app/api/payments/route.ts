@@ -7,13 +7,13 @@ export async function GET() {
   const memberstackPayments = await fetchRecentPayments(20);
 
   if (memberstackPayments.length > 0) {
-    // If we have Memberstack data, use it
+    // If we have Memberstack data, use it (includes test Stripe payments)
     return NextResponse.json({ payments: memberstackPayments });
   }
 
   // Fallback to in-memory store if Memberstack is not available
   const payments = paymentsStore.getRecentPayments(20);
-  return NextResponse.json({ payments });
+  return NextResponse.json({ payments: payments });
 }
 
 // Allow CORS if needed
