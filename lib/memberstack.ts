@@ -1,6 +1,6 @@
 // Memberstack service for managing payment data
 
-const MEMBERSTACK_API_URL = 'https://admin.memberstack.com/graphql';
+const MEMBERSTACK_API_URL = 'https://admin.memberstack.io/graphql';
 
 export interface Payment {
   id: string;

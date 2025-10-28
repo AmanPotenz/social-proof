@@ -30,7 +30,8 @@
       "mcp__memberstack__createDataTableField",
       "Bash(git restore:*)",
       "mcp__memberstack__getDataRecords",
-      "mcp__memberstack__createDataRecord"
+      "mcp__memberstack__createDataRecord",
+      "mcp__memberstack__memberstackKnowledgeSearch"
     ],
     "deny": [],
     "ask": []

@@ -14,7 +14,7 @@ export async function GET() {
   console.log('Testing Memberstack with:', testPayment);
 
   const MEMBERSTACK_SECRET_KEY = process.env.MEMBERSTACK_SECRET_KEY;
-  const MEMBERSTACK_API_URL = 'https://admin.memberstack.com/graphql';
+  const MEMBERSTACK_API_URL = 'https://admin.memberstack.io/graphql';
 
   const mutation = `
     mutation CreatePaymentRecord($input: CreateDataRecordInput!) {
