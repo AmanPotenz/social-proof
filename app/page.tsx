@@ -90,6 +90,18 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Test Purchase Button */}
+        <div className="text-center mb-8">
+          <a
+            href="https://buy.stripe.com/test_14AeVf22pgPcgmI7K54AU00"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition-all"
+          >
+            Make Test Purchase
+          </a>
+        </div>
+
         {/* Payment Blocks */}
         {payments.length === 0 ? (
           <div className="text-center py-20">
@@ -97,14 +109,6 @@ export default function Home() {
             <p className="text-2xl text-gray-400">
               No purchases yet. Make a test purchase to see it appear here!
             </p>
-            <a
-              href="https://buy.stripe.com/test_14AeVf22pgPcgmI7K54AU00"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block mt-6 px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition-all"
-            >
-              Make Test Purchase
-            </a>
           </div>
         ) : (
           <div className="space-y-4">
