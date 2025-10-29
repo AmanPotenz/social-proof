@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Retrieve line items to get the price/product information
-    let planName = 'Unknown Plan';
+    let planName = 'Pro'; // Default to Pro
     try {
       const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
         limit: 1,
@@ -74,23 +74,37 @@ export async function POST(req: NextRequest) {
       if (lineItems.data.length > 0) {
         const priceId = lineItems.data[0].price?.id;
         const productDescription = lineItems.data[0].description;
+        const amount = lineItems.data[0].amount_total || 0;
 
         console.log('Line item details:', {
           priceId,
           productDescription,
+          amount,
         });
 
         // Map price IDs to plan names
-        // You can add your actual price IDs here
         const priceIdToPlan: Record<string, string> = {
-          // Add your actual Stripe price IDs here
-          // Example: 'price_1234567890': 'Basic Plan',
+          'price_1QSf9qP2koqkGI7YRjVyMo7a': 'Pro',
+          'price_1QSfA7P2koqkGI7YY5WDY8f1': 'Pro Plus',
+          // Add more price IDs as needed
         };
 
+        // Try to determine plan from price ID first
         if (priceId && priceIdToPlan[priceId]) {
           planName = priceIdToPlan[priceId];
-        } else if (productDescription) {
-          planName = productDescription;
+        }
+        // Fall back to product description
+        else if (productDescription) {
+          const desc = productDescription.toLowerCase();
+          if (desc.includes('plus') || desc.includes('premium')) {
+            planName = 'Pro Plus';
+          } else {
+            planName = 'Pro';
+          }
+        }
+        // Fall back to amount (higher amount = Pro Plus)
+        else if (amount >= 1000) { // $10 or more
+          planName = 'Pro Plus';
         }
       }
     } catch (error) {

@@ -14,6 +14,8 @@ interface Payment {
 
 export default function Home() {
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [planFilter, setPlanFilter] = useState<string>('all');
+  const [dateFilter, setDateFilter] = useState<string>('all');
 
   // Fetch payments from API
   const fetchPayments = async () => {
@@ -74,6 +76,29 @@ export default function Home() {
     return `${Math.floor(seconds / 86400)} days ago`;
   };
 
+  // Filter payments based on selected filters
+  const filteredPayments = payments.filter((payment) => {
+    // Plan filter
+    if (planFilter !== 'all') {
+      if (planFilter === 'pro' && payment.plan !== 'Pro') return false;
+      if (planFilter === 'pro-plus' && payment.plan !== 'Pro Plus') return false;
+    }
+
+    // Date filter
+    if (dateFilter !== 'all') {
+      const now = Date.now();
+      const dayInMs = 24 * 60 * 60 * 1000;
+      const paymentAge = now - payment.timestamp;
+
+      if (dateFilter === '24h' && paymentAge > dayInMs) return false;
+      if (dateFilter === '7d' && paymentAge > 7 * dayInMs) return false;
+      if (dateFilter === '30d' && paymentAge > 30 * dayInMs) return false;
+      if (dateFilter === '3m' && paymentAge > 90 * dayInMs) return false;
+    }
+
+    return true;
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 p-8">
       <div className="max-w-7xl mx-auto">
@@ -96,18 +121,18 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
             <div className="text-gray-400 text-sm mb-2">Total Purchases</div>
-            <div className="text-4xl font-bold text-white">{payments.length}</div>
+            <div className="text-4xl font-bold text-white">{filteredPayments.length}</div>
           </div>
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
             <div className="text-gray-400 text-sm mb-2">Total Revenue</div>
             <div className="text-4xl font-bold text-white">
-              ${payments.reduce((sum, p) => sum + p.amount, 0).toFixed(2)}
+              ${filteredPayments.reduce((sum, p) => sum + p.amount, 0).toFixed(2)}
             </div>
           </div>
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
             <div className="text-gray-400 text-sm mb-2">Latest Purchase</div>
             <div className="text-2xl font-bold text-white">
-              {payments.length > 0 ? getRelativeTime(payments[0].timestamp) : 'No purchases yet'}
+              {filteredPayments.length > 0 ? getRelativeTime(filteredPayments[0].timestamp) : 'No purchases yet'}
             </div>
           </div>
         </div>
@@ -130,7 +155,7 @@ export default function Home() {
               rel="noopener noreferrer"
               className="inline-block px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all"
             >
-              Plan 1 - Direct Stripe Link
+              Pro Plan - $9.00
             </a>
             <a
               href="https://buy.stripe.com/test_fZu6oJcH3eH4c6s2pL4AU01"
@@ -138,22 +163,92 @@ export default function Home() {
               rel="noopener noreferrer"
               className="inline-block px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all"
             >
-              Plan 2 - Direct Stripe Link
+              Pro Plus Plan - $10.00
             </a>
           </div>
         </div>
 
+        {/* Filters */}
+        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Plan Filter */}
+            <div>
+              <label className="block text-gray-300 text-sm font-semibold mb-2">
+                Filter by Plan
+              </label>
+              <select
+                value={planFilter}
+                onChange={(e) => setPlanFilter(e.target.value)}
+                className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-purple-500 transition-colors"
+              >
+                <option value="all">All Plans</option>
+                <option value="pro">Pro</option>
+                <option value="pro-plus">Pro Plus</option>
+              </select>
+            </div>
+
+            {/* Date Filter */}
+            <div>
+              <label className="block text-gray-300 text-sm font-semibold mb-2">
+                Filter by Date
+              </label>
+              <select
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-lg focus:outline-none focus:border-purple-500 transition-colors"
+              >
+                <option value="all">All Time</option>
+                <option value="24h">Last 24 Hours</option>
+                <option value="7d">Last 7 Days</option>
+                <option value="30d">Last 30 Days</option>
+                <option value="3m">Last 3 Months</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Active Filters Display */}
+          {(planFilter !== 'all' || dateFilter !== 'all') && (
+            <div className="mt-4 flex items-center gap-2">
+              <span className="text-gray-400 text-sm">Active filters:</span>
+              {planFilter !== 'all' && (
+                <span className="px-3 py-1 bg-purple-500/30 text-purple-300 rounded-full text-sm">
+                  {planFilter === 'pro' ? 'Pro' : 'Pro Plus'}
+                </span>
+              )}
+              {dateFilter !== 'all' && (
+                <span className="px-3 py-1 bg-blue-500/30 text-blue-300 rounded-full text-sm">
+                  {dateFilter === '24h' && 'Last 24 Hours'}
+                  {dateFilter === '7d' && 'Last 7 Days'}
+                  {dateFilter === '30d' && 'Last 30 Days'}
+                  {dateFilter === '3m' && 'Last 3 Months'}
+                </span>
+              )}
+              <button
+                onClick={() => {
+                  setPlanFilter('all');
+                  setDateFilter('all');
+                }}
+                className="ml-2 text-gray-400 hover:text-white text-sm underline"
+              >
+                Clear all
+              </button>
+            </div>
+          )}
+        </div>
+
         {/* Payment Blocks */}
-        {payments.length === 0 ? (
+        {filteredPayments.length === 0 ? (
           <div className="text-center py-20">
             <div className="text-6xl mb-4">💳</div>
             <p className="text-2xl text-gray-400">
-              No purchases yet. Make a test purchase to see it appear here!
+              {payments.length === 0
+                ? 'No purchases yet. Make a test purchase to see it appear here!'
+                : 'No purchases match the selected filters. Try adjusting your filters.'}
             </p>
           </div>
         ) : (
           <div className="space-y-4">
-            {payments.map((payment, index) => (
+            {filteredPayments.map((payment, index) => (
               <div
                 key={payment.id}
                 className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 hover:border-purple-500/50 transition-all transform hover:scale-[1.02] animate-fade-in"
