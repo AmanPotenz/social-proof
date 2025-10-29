@@ -9,6 +9,7 @@ interface Payment {
   currency: string;
   timestamp: number;
   email?: string;
+  plan?: string;
 }
 
 export default function Home() {
@@ -122,14 +123,22 @@ export default function Home() {
             </button>
           </div>
           <div className="text-gray-400 text-sm">or</div>
-          <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
             <a
               href="https://buy.stripe.com/test_14AeVf22pgPcgmI7K54AU00"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all"
             >
-              Direct Stripe Link (Opens New Tab)
+              Plan 1 - Direct Stripe Link
+            </a>
+            <a
+              href="https://buy.stripe.com/test_fZu6oJcH3eH4c6s2pL4AU01"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all"
+            >
+              Plan 2 - Direct Stripe Link
             </a>
           </div>
         </div>
@@ -166,6 +175,11 @@ export default function Home() {
                       </div>
                       <div className="text-gray-400 text-sm">
                         {payment.email || 'Customer'}
+                        {payment.plan && (
+                          <span className="ml-2 px-2 py-0.5 bg-purple-500/30 text-purple-300 rounded text-xs">
+                            {payment.plan}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>

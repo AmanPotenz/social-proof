@@ -6,6 +6,7 @@ export interface Payment {
   currency: string;
   timestamp: number;
   email?: string;
+  plan?: string;
 }
 
 class PaymentsStore {

@@ -64,6 +64,39 @@ export async function POST(req: NextRequest) {
       amount: session.amount_total,
     });
 
+    // Retrieve line items to get the price/product information
+    let planName = 'Unknown Plan';
+    try {
+      const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+        limit: 1,
+      });
+
+      if (lineItems.data.length > 0) {
+        const priceId = lineItems.data[0].price?.id;
+        const productDescription = lineItems.data[0].description;
+
+        console.log('Line item details:', {
+          priceId,
+          productDescription,
+        });
+
+        // Map price IDs to plan names
+        // You can add your actual price IDs here
+        const priceIdToPlan: Record<string, string> = {
+          // Add your actual Stripe price IDs here
+          // Example: 'price_1234567890': 'Basic Plan',
+        };
+
+        if (priceId && priceIdToPlan[priceId]) {
+          planName = priceIdToPlan[priceId];
+        } else if (productDescription) {
+          planName = productDescription;
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching line items:', error);
+    }
+
     // Extract payment information
     const payment = {
       id: session.id,
@@ -72,6 +105,7 @@ export async function POST(req: NextRequest) {
       currency: session.currency?.toUpperCase() || 'USD',
       timestamp: Date.now(),
       email: session.customer_details?.email || undefined,
+      plan: planName,
     };
 
     // Add to in-memory store for immediate display

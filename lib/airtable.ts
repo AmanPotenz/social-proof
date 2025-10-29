@@ -8,6 +8,7 @@ export interface Payment {
   currency: string;
   timestamp: number;
   email?: string;
+  plan?: string;
 }
 
 // Initialize Airtable with Personal Access Token
@@ -49,6 +50,7 @@ export async function createPaymentRecord(payment: Payment): Promise<boolean> {
           amount: payment.amount,
           currency: payment.currency,
           email: payment.email || '',
+          plan: payment.plan || '',
           timestamp: new Date(payment.timestamp).toISOString(),
         },
       },
@@ -93,6 +95,7 @@ export async function fetchRecentPayments(limit: number = 20): Promise<Payment[]
         currency: fields.currency || 'USD',
         timestamp: new Date(fields.timestamp).getTime(),
         email: fields.email || undefined,
+        plan: fields.plan || undefined,
       };
     });
 
