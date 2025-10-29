@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
           }
         }
         // Fall back to amount (higher amount = Pro Plus)
-        else if (amount >= 1000) { // $10 or more
+        else if (amount >= 2000) { // $20 or more (Pro Plus is $29)
           planName = 'Pro Plus';
         }
       }

@@ -163,7 +163,7 @@ export default function Home() {
               rel="noopener noreferrer"
               className="inline-block px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all"
             >
-              Pro Plus Plan - $10.00
+              Pro Plus Plan - $29.00
             </a>
           </div>
         </div>
